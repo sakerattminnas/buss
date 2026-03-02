@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<head>
+    <title>Är det lågtrafik?</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        document.addEventListener("DOMContentLoaded", mainFunc);
+
+        function isLowTrafficDay(date) {
+            return date.getDay() == 0 || date.getDay() == 6;
+        }
+
+        function isLowTrafficTime(date) {
+            let hour = date.getHours();
+            let minute = date.getMinutes();
+            if (hour == 8) {
+                return minute >= 30;
+            } else if (hour == 6) {
+                return minute < 30;
+            }
+            return (8 < hour && hour < 15) || hour >= 17 || hour < 6;
+        }
+
+        function timeUntilLowTraffic() {
+            let date = new Date();
+            if (isLowTrafficDay(date) || isLowTrafficTime(date)) {
+                return "0 min";
+            }
+
+            let one = new Date(
+                date.getFullYear(),
+                date.getMonth(), 
+                date.getDate(), 
+                8, 30
+            ).getTime() - date.getTime();
+
+            let two = new Date(
+                date.getFullYear(),
+                date.getMonth(), 
+                date.getDate(), 
+                17, 0
+            ).getTime() - date.getTime();
+
+            console.log(one, two)
+
+            if (two < 0 || (one < two && one > 0)) {
+                return Math.ceil(one / (1000*60)) + " min";
+            } else {
+                return Math.ceil(two / (1000*60)) + " min";
+            }
+
+            console.error("Time until cannot be negative.");
+            return;
+        }
+
+        function mainFunc() {
+            let date = new Date();
+            if (isLowTrafficDay(date) || isLowTrafficTime(date)) {
+                document.getElementById("yes").style = ""
+            } else {
+                document.getElementById("no").style = ""
+                let text = document.getElementById("text");
+                text.innerHTML = "Tid kvar till lågtrafik: <br><b>" 
+                    + timeUntilLowTraffic() + "</b>";
+                setInterval(function() {
+                    text.innerHTML = "Tid kvar till lågtrafik: <br><b>" 
+                        + timeUntilLowTraffic() + "</b>";
+                }, 10000)
+            }
+        }
+    </script>
+    <style>
+        main {
+            padding-top: 3rem;
+        }
+        main > div {
+            margin: auto;
+            padding-top: 3rem;
+            text-align: center;
+            font-size:x-large;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div>
+            <span id="yes" style="display: none;">✅ Det är lågtrafik ✅</span>
+            <span id="no" style="display: none;">❌ Det är inte lågtrafik ❌</span>
+        </div>
+        <div id="text"></div>
+    </main>
+</body>
