@@ -28,24 +28,68 @@
 
             let one = new Date(
                 date.getFullYear(),
-                date.getMonth(), 
-                date.getDate(), 
+                date.getMonth(),
+                date.getDate(),
                 8, 30
             ).getTime() - date.getTime();
 
             let two = new Date(
                 date.getFullYear(),
-                date.getMonth(), 
-                date.getDate(), 
+                date.getMonth(),
+                date.getDate(),
                 17, 0
             ).getTime() - date.getTime();
 
-            console.log(one, two)
-
             if (two < 0 || (one < two && one > 0)) {
-                return Math.ceil(one / (1000*60)) + " min";
+                let mins = Math.ceil(one / (1000*60));
+                let hours = Math.floor(mins / 60);
+                return hours + " h " + (mins - hours*60) + " min";
             } else {
-                return Math.ceil(two / (1000*60)) + " min";
+                let mins = Math.ceil(two / (1000*60));
+                let hours = Math.floor(mins / 60);
+                return hours + " h " + (mins - hours*60) + " min";
+            }
+
+            console.error("Time until cannot be negative.");
+            return;
+        }
+
+        function timeLeftOfLowTraffic() {
+            let date = new Date();
+
+            let one = new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate(),
+                6, 30
+            ).getTime() - date.getTime();
+
+            let two = new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate() + 1,
+                6, 30
+            ).getTime() - date.getTime();
+
+            let three = new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate(),
+                15, 0
+            ).getTime() - date.getTime();
+
+            if (one > 0 && (one < two || two < 0) && (one < three || three < 0)) {
+                let mins = Math.ceil(one / (1000*60));
+                let hours = Math.floor(mins / 60);
+                return hours + " h " + (mins - hours*60) + " min";
+            } else if (two > 0 && (two < one || one < 0) && (two < three || three < 0)) {
+                let mins = Math.ceil(two / (1000*60));
+                let hours = Math.floor(mins / 60);
+                return hours + " h " + (mins - hours*60) + " min";
+            } else if (three > 0 && (three < one || one < 0) && (three < two || two < 0)) {
+                let mins = Math.ceil(three / (1000*60));
+                let hours = Math.floor(mins / 60);
+                return hours + " h " + (mins - hours*60) + " min";
             }
 
             console.error("Time until cannot be negative.");
@@ -56,13 +100,20 @@
             let date = new Date();
             if (isLowTrafficDay(date) || isLowTrafficTime(date)) {
                 document.getElementById("yes").style = ""
+                let text = document.getElementById("text");
+                text.innerHTML = "Tid kvar av lågtrafik: <br><b>"
+                    + timeLeftOfLowTraffic() + "</b>";
+                setInterval(function() {
+                    text.innerHTML = "Tid kvar av lågtrafik: <br><b>"
+                        + timeLeftOfLowTraffic() + "</b>";
+                }, 10000)
             } else {
                 document.getElementById("no").style = ""
                 let text = document.getElementById("text");
-                text.innerHTML = "Tid kvar till lågtrafik: <br><b>" 
+                text.innerHTML = "Tid kvar till lågtrafik: <br><b>"
                     + timeUntilLowTraffic() + "</b>";
                 setInterval(function() {
-                    text.innerHTML = "Tid kvar till lågtrafik: <br><b>" 
+                    text.innerHTML = "Tid kvar till lågtrafik: <br><b>"
                         + timeUntilLowTraffic() + "</b>";
                 }, 10000)
             }
